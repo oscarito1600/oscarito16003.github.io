@@ -185,7 +185,7 @@ function restartGame() {
 
 function jump() {
     if (!gameOver && bird) {  // Solo permite saltar si el juego no está terminado
-        bird.velocity = -8;
+        bird.velocity = -7.7;
         console.log("Salto ejecutado");
     } else {
         console.error("Error: Bird no está definido o el juego está terminado.");
