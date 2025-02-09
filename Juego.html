@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de MNC_KA</title>
+    <link rel="stylesheet" href="estilo.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { text-align: center; background-color: skyblue; overflow: hidden; }
+        canvas { display: block; margin: auto; }
+        #menu, #gameOverScreen { display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); color: white; font-size: 24px; }
+        #gameOverScreen { display: none; }
+        button { padding: 10px 20px; font-size: 18px; cursor: pointer; margin-top: 10px; }
+        #menu img { width: 150px; margin-bottom: 20px; }
+        #score { color: yellow; font-size: 20px; font-weight: bold; }
+        #highScore { color: orange; font-size: 20px; font-weight: bold; }
+        #jumpButton { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgb(255, 187, 0); color: white; border: none; border-radius: 5px; padding: 10px 20px; font-size: 18px; cursor: pointer; z-index: 9999; }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <img src="Logo.jpg" alt="Jugar">
+        <button onclick="startGame()">Jugar</button>
+        <li><a href="Personajes.html">Personajes</a></li>
+        <li><a href="creditos.html">Creditos</a></li>
+        <li><a href="Intrucciones.html">Instrucciones</a></li>
+    </div>
+    <div id="gameOverScreen">
+        <p>Has perdido</p>
+        <button onclick="restartGame()">Volver a intentar</button>
+        <button onclick="goToMenu()">Volver al menú</button>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <audio id="coinSound" src="moneda.mp3"></audio>
+    <audio id="hitSound" src="moneda.mp3"></audio>
+    <audio id="bgMusic" src="cancion.mp3" loop></audio>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 400;
+        canvas.height = 500;
+
+        let birdImg = new Image();
+        birdImg.src = "MNC_KA.png";
+        let pipeImg = new Image();
+        pipeImg.src = "Muero.png";
+        let bgImg = new Image();
+        bgImg.src = "paisaje.png";
+        let coinImg = new Image();
+        coinImg.src = "moneda.png";
+
+        let bird, pipes, coins, frame, gameOver, score, highScore;
+
+        function init() {
+    bird = { x: 50, y: 150, width: 60, height: 60, velocity: 0, gravity: 0.4 };
+    pipes = [];
+    coins = [];
+    frame = 0;
+    gameOver = false;
+    score = 0;
+    highScore = parseInt(localStorage.getItem("highScore")) || 0;
+    document.getElementById("bgMusic").play();
+
+    console.log("Bird inicializado:", bird);  // Verifica que bird esté inicializado
+
+        }
+
+        function drawBird() {
+            ctx.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                ctx.drawImage(pipeImg, pipe.x, 0, pipe.width, pipe.top);
+                ctx.drawImage(pipeImg, pipe.x, pipe.bottom, pipe.width, canvas.height - pipe.bottom);
+            });
+        }
+
+        function drawCoins() {
+            coins.forEach(coin => {
+                ctx.drawImage(coinImg, coin.x, coin.y, coin.size, coin.size);
+            });
+        }
+
+        function drawBackground() {
+            ctx.fillStyle = "skyblue";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (bgImg.src) {
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function update() {
+            if (gameOver) return;
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (frame % 120 === 0) {
+                let pipeHeight = Math.random() * (canvas.height / 2);
+                let gap = 170;
+                pipes.push({ x: canvas.width, width: 80, top: pipeHeight, bottom: pipeHeight + gap });
+                let coinY = pipeHeight + gap / 2;
+                coins.push({ x: canvas.width + 30, y: coinY, size: 30 });
+            }
+
+            pipes.forEach(pipe => {
+                pipe.x -= 2;
+                if (bird.x < pipe.x + pipe.width && bird.x + bird.width > pipe.x && (bird.y < pipe.top || bird.y + bird.height > pipe.bottom)) {
+                    triggerGameOver();
+                }
+            });
+
+            coins.forEach((coin, index) => {
+                coin.x -= 2;
+                if (bird.x < coin.x + coin.size && bird.x + bird.width > coin.x && bird.y < coin.y + coin.size && bird.y + bird.height > coin.y) {
+                    score++;
+                    coins.splice(index, 1);
+                    document.getElementById("coinSound").play();
+                }
+            });
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) triggerGameOver();
+            frame++;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+            drawBird();
+            drawPipes();
+            drawCoins();
+            ctx.fillStyle = "yellow";
+            ctx.font = "20px Arial";
+            ctx.fillText("Puntos: " + score, 20, 30);
+            ctx.fillStyle = "orange";
+        }
+
+        function loop() {
+            update();
+            draw();
+            if (!gameOver) requestAnimationFrame(loop);
+        }
+        function startGame() {
+    document.getElementById("menu").style.display = "none";
+    init();  // Inicializamos el juego
+    loop();  // Comenzamos el ciclo del juego
+    document.getElementById("jumpButton").style.display = "block";  // Asegura que el botón de salto sea visible
+
+
+}
+
+function triggerGameOver() {
+    gameOver = true;  // El juego ha terminado
+    document.getElementById("hitSound").play();
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+    }
+    document.getElementById("gameOverScreen").style.display = "flex";
+    document.getElementById("jumpButton").style.display = "none";  // Ocultamos el botón de salto al perder
+}
+
+        function goToMenu() {
+            document.getElementById("gameOverScreen").style.display = "none";
+            document.getElementById("menu").style.display = "flex";
+            gameOver = false;
+            score = 0;
+        }
+
+function restartGame() {
+    document.getElementById("gameOverScreen").style.display = "none";
+    document.getElementById("jumpButton").style.display = "block";  // Mostramos el botón de salto nuevamente
+    startGame();  // Reiniciar el juego
+}
+
+
+        window.addEventListener("keydown", (event) => {
+            if (event.code === "Space" || event.code === "ArrowUp") {
+                jump();
+            }
+  });
+
+ 
+
+function jump() {
+    if (!gameOver && bird) {  // Solo permite saltar si el juego no está terminado
+        bird.velocity = -8;
+        console.log("Salto ejecutado");
+    } else {
+        console.error("Error: Bird no está definido o el juego está terminado.");
+    }
+
+}
+    document.addEventListener("DOMContentLoaded", () => {
+    const jumpButton = document.getElementById("jumpButton");
+
+    // Habilitar el botón de salto durante el juego
+    if (jumpButton) {
+        jumpButton.addEventListener("click", () => {
+            console.log("Botón clickeado");
+            jump();
+        });
+
+        jumpButton.addEventListener("touchstart", () => {
+            console.log("Botón tocado");
+            jump();
+        });
+    } else {
+        console.error("Error: No se encontró el botón jumpButton");
+    }
+});
+    </script>
+   <button id="jumpButton">Saltar</button>
+
+
+</body>
+</html>
+

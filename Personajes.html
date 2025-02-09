@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Menu del juego</title>
+    <link rel="stylesheet" href="estilo.css">
+    <style>
+        body {
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: url(img/Fondo2.jpg) no-repeat center center fixed;
+            background-size: cover;
+        }
+        
+        nav {
+            position: relative;
+            top: 0;
+            margin-top: 20px;
+        }
+        
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        #biblioteca {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 100px; /* Separa las imágenes del menú */
+            flex-wrap: wrap;
+        }
+        
+        .libro {
+            width: 200px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            margin: 10px;
+        }
+        
+        .libro img {
+            width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+        }
+        
+        .libro img:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+        
+        #mensaje {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        
+        @media (max-width: 768px) {
+            #biblioteca {
+                flex-direction: column;
+                align-items: center; 
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav role="navigation" aria-label="Menú principal">
+        <div class="menu">
+            <ul>
+                <li><a href="Personajes.html">Personajes</a></li>
+                <li><a href="Juego.html">Jugar</a></li>
+                <li><a href="creditos.html">Creditos</a></li>
+                <li><a href="Intrucciones.html">Instrucciones</a></li>
+        </div>
+    </nav>
+
+    <div id="biblioteca" role="region" aria-labelledby="mensaje">
+        <div class="libro" data-titulo="Libro 1">
+            <a href="MNC_KA contruc.html">
+                <img src="MNC_KA CONTRUCTOR.png" alt="Portada Libro 1">
+            </a>
+        </div>
+        <div class="libro" data-titulo="Libro 2">
+            <a href="Bobicras.html">
+                <img src="Bobicraft.png" alt="Portada Libro 2">
+            </a>
+        </div>
+        <div class="libro" data-titulo="Libro 3">
+            <a href="Plata.html">
+                <img src="MNC_KA de plata.png" alt="Portada Libro 3">
+            </a>
+        </div>
+        <div class="libro" data-titulo="Libro 4">
+            <a href="Oro.html">
+                <img src="MNC_KA DE ORO.png" alt="Portada Libro 4">
+            </a>
+        </div>
+
+    </div>
+
+    <p id="mensaje"></p>
+
+    <script>
+        const libros = document.querySelectorAll('.libro');
+        const mensaje = document.getElementById('mensaje');
+
+        libros.forEach(libro => {
+            libro.addEventListener('click', () => {
+                const titulo = libro.getAttribute('data-titulo');
+                
+                if (mensaje.textContent === `Has seleccionado: ${titulo}`) {
+                    mensaje.textContent = ''; 
+                    libro.querySelector('img').style.border = 'none';
+                } else {
+                    mensaje.textContent = `Has seleccionado: ${titulo}`;
+                    libros.forEach(libro => libro.querySelector('img').style.border = 'none'); 
+                    libro.querySelector('img').style.border = '5px solid #8bc34a';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
