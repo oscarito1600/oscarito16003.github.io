@@ -158,14 +158,6 @@
             drawBird();
             drawPipes();
             drawCoins();
-
-            ctx.fillStyle = "yellow";
-            ctx.font = "20px Arial";
-            ctx.fillText("Puntos: " + score, 20, 30);
-
-            ctx.fillStyle = "orange";
-            ctx.fillText("Máximo: " + highScore, 250, 30);
-
             document.getElementById("score").innerText = "Puntos: " + score;
             document.getElementById("highScore").innerText = "Puntaje más alto: " + highScore;
         }
@@ -223,7 +215,7 @@
 
         function jump() {
             if (!gameOver && bird) {
-                bird.velocity = -3;
+                bird.velocity = -5;
                 console.log("Salto ejecutado");
             } else {
                 console.error("Error: Bird no está definido o el juego está terminado.");
